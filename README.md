@@ -40,7 +40,7 @@ for (bit_buffer::iterator iter = bb.begin(); iter != bb.end(); ++iter) {
     // Do stuff with bit
 }
 
-for (auto& bit : bb.begin()) {
+for (auto& bit : bb) {
     // Do stuff with bit
 }
 
