@@ -28,8 +28,8 @@ std::cout << bb.read_bits(2, 2) << std::endl;  // Prints out 2
 std::cout << bb.read_bits(4, 4) << std::endl;  // Prints out 10
 std::cout << bb.read_byte(1) << std::endl;     // Prints out 100
 std::cout << bb.read_bits(8, 8) << std::endl;  // Prints out 100
-std::cout << bb.read_byte(0) << std::endl;     // 0110 1010, so it prints out 106
-std::cout << bb.read_bytes(0, 2) << std::endl; // 0110 1010 0110 0100, so it prints out 27236
+std::cout << bb.read_byte(0) << std::endl;     // 1010 1010, so it prints out 170
+std::cout << bb.read_bytes(0, 2) << std::endl; // 1010 1010 0110 0100, so it prints out 43620
 
 // Iterators
 
