@@ -30,6 +30,24 @@ std::cout << bb.read_byte(1) << std::endl;     // Prints out 100
 std::cout << bb.read_bits(8, 8) << std::endl;  // Prints out 100
 std::cout << bb.read_byte(0) << std::endl;     // 0110 1010, so it prints out 106
 std::cout << bb.read_bytes(0, 2) << std::endl; // 0110 1010 0110 0100, so it prints out 27236
+
+// Iterators
+
+// Bit Iterator
+for (bit_buffer::iterator iter = bb.begin(); iter != bb.end(); ++iter) {
+    uint8_t bit = *iter;
+
+    // Do stuff with bit
+}
+
+for (auto& bit : bb.begin()) {
+    // Do stuff with bit
+}
+
+// Byte iterator
+for (auto& byte : bb.get_bytes()) {
+    // Do stuff with byte
+}
 ```
 
 ## License

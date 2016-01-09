@@ -148,7 +148,7 @@ class bit_buffer {
                 uint32_t p = num_bits - bits_read;
                 offset = 0;
                 while (p < num_bits) {
-                    ret += ((byte >> offset) & 0x01) * pow(2, p);
+                    ret += static_cast<uint32_t>(((byte >> offset) & 0x01) * pow(2, p));
                     ++p;
                     ++offset;
                 }
@@ -165,7 +165,7 @@ class bit_buffer {
             }
 
             byte >>= (8 - num_bits - bit_index_start);
-            ret += byte;
+            ret += static_cast<uint32_t>(byte);
 
             return ret;
         }
