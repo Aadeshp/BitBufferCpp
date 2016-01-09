@@ -1,5 +1,5 @@
-#ifndef BYTE_BUFFER_HPP_
-#define BYTE_BUFFER_HPP_
+#ifndef BIT_BUFFER_HPP_
+#define BIT_BUFFER_HPP_
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,6 +11,9 @@
 #include <iostream>
 
 #define DEFAULT_SIZE 1024
+
+class bit_iterator;
+
 /*
  * Byte buffer is a class that lets you easily serialize data
  * into the form of bits and bytes, and stores it all in a
@@ -35,6 +38,10 @@
  *      std::cout << bb.read_byte(5) << std::endl;      // Outputs 8
  */
 class bit_buffer {
+    friend class bit_iterator;
+    typedef bit_iterator iterator;
+    typedef const bit_iterator const_iterator;
+
     private:
         /*
          * Private type definitions
@@ -114,7 +121,7 @@ class bit_buffer {
             this->write_bits_(data, bytes * 8);
         }
 
-        uint32_t read_bits_(const size_t bit_index, const size_t num_bits, size_t ret) {
+        uint32_t read_bits_(const size_t bit_index, const size_t num_bits, size_t ret) const {
             if (bit_index + num_bits > this->buffer_.size() * 8) {
                 throw;
             }
@@ -138,10 +145,12 @@ class bit_buffer {
 
                 //ret += byte;
                 uint32_t bits_read = 8 - bit_index_start;
-                uint32_t i = num_bits - bits_read;
-                while (i < num_bits) {
-                    ret += ((byte >> (i - 1)) & 1) * pow(2, i);
-                    ++i;
+                uint32_t p = num_bits - bits_read;
+                offset = 0;
+                while (p < num_bits) {
+                    ret += ((byte >> offset) & 0x01) * pow(2, p);
+                    ++p;
+                    ++offset;
                 }
 
                 return read_bits_(bit_index + bits_read, num_bits - bits_read, ret);
@@ -166,15 +175,8 @@ class bit_buffer {
                 throw;
             }
 
-            uint32_t ret = 0;
-            uint32_t byte_index_end = byte_index + num_bytes - 1;
-            for (size_t i = byte_index; i <= byte_index_end; ++i) {
-                ret += static_cast<uint32_t>(this->buffer_[i]);
-            }
-
-            return ret;
+            return this->read_bits_(byte_index * 8, num_bytes * 8, 0);
         }
-
 
     public:
         bit_buffer(const size_t size = DEFAULT_SIZE);
@@ -237,6 +239,78 @@ class bit_buffer {
         uint32_t read_bits(const size_t bit_index, const size_t num_bits);
 
         inline const bytes_t get_bytes() const { return this->buffer_; }
+        bit_iterator create_iter() const;
+
+
+        /* 
+         * For each loop iterator
+         */
+        iterator begin();
+        const_iterator begin() const;
+        iterator end();
+        const_iterator end() const;
+
+        /*
+         * Operator overrides
+         */
+        bool operator==(const bit_buffer &other) {
+            return this->buffer_ == other.buffer_;
+        }
+
+        bool operator!=(const bit_buffer &other) {
+            return this->buffer_ != other.buffer_;
+        }
+};
+
+class bit_iterator {
+    private:
+        bit_buffer buffer_;
+        size_t bit_index_;
+
+    public:
+        explicit bit_iterator(const bit_buffer& buffer) :
+            buffer_(buffer), bit_index_(0)
+        {}
+
+        bit_iterator(const bit_buffer& buffer, const size_t bit_index) :
+            buffer_(buffer), bit_index_(bit_index)
+        {}
+
+        inline uint8_t current_bit() const {
+            return static_cast<uint8_t>(this->buffer_.read_bits_(this->bit_index_, 1, 0));
+        }
+
+        /*
+         * Operator overrides
+         */
+        bit_iterator &operator++() {
+            ++this->bit_index_;
+
+            return *this;
+        }
+
+        bit_iterator operator++(int) {
+            bit_iterator temp = *this;
+            ++*this;
+
+            return temp;
+        }
+
+        bool operator==(const bit_iterator &other) {
+            return this->bit_index_ == other.bit_index_;
+        }
+
+        bool operator!=(const bit_iterator &other) {
+            return this->bit_index_ != other.bit_index_;
+        }
+
+        uint8_t operator*() {
+            return this->current_bit();
+        }
+
+        uint8_t operator*() const {
+            return this->current_bit();
+        }
 };
 
 #endif

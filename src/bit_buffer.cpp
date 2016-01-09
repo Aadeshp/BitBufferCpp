@@ -47,3 +47,23 @@ uint8_t bit_buffer::read_bit(const size_t bit_index) {
 uint32_t bit_buffer::read_bits(const size_t bit_index, const size_t num_bits) {
     return this->read_bits_(bit_index, num_bits, 0);
 }
+
+bit_iterator bit_buffer::create_iter() const {
+    return bit_iterator(*this);
+}
+
+bit_buffer::iterator bit_buffer::begin() {
+    return bit_iterator(*this);
+}
+
+bit_buffer::const_iterator bit_buffer::begin() const {
+    return bit_iterator(*this);
+}
+
+bit_buffer::iterator bit_buffer::end() {
+    return bit_iterator(*this, this->buffer_.size() * 8);
+}
+
+bit_buffer::const_iterator bit_buffer::end() const {
+    return bit_iterator(*this, this->buffer_.size() * 8);
+}
