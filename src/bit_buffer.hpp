@@ -239,6 +239,7 @@ class bit_buffer {
         uint32_t read_bits(const size_t bit_index, const size_t num_bits);
 
         inline const bytes_t get_bytes() const { return this->buffer_; }
+        inline size_t size() const { return buffer_.size(); }
         bit_iterator create_iter() const;
 
 
